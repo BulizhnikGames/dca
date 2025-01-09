@@ -56,6 +56,8 @@ type EncodeOptions struct {
 	AudioFilter string
 
 	Comment string // Leave a comment in the metadata
+
+	Path string // path to folder where are ffmpeg and ffprobe
 }
 
 func (e EncodeOptions) PCMFrameLen() int {
@@ -230,7 +232,7 @@ func (e *EncodeSession) run() {
 
 	args = append(args, "pipe:1")
 
-	ffmpeg := exec.Command("ffmpeg", args...)
+	ffmpeg := exec.Command(e.options.Path+"ffmpeg", args...)
 
 	// logln(ffmpeg.Args)
 
@@ -316,7 +318,7 @@ func (e *EncodeSession) writeMetadataFrame() {
 	var cmdBuf bytes.Buffer
 	// get ffprobe data
 	if e.pipeReader == nil {
-		ffprobe := exec.Command("ffprobe", "-v", "quiet", "-print_format", "json", "-show_format", e.filePath)
+		ffprobe := exec.Command(e.options.Path+"ffprobe", "-v", "quiet", "-print_format", "json", "-show_format", e.filePath)
 		ffprobe.Stdout = &cmdBuf
 
 		err := ffprobe.Start()
@@ -369,7 +371,7 @@ func (e *EncodeSession) writeMetadataFrame() {
 		cmdBuf.Reset()
 
 		// get cover art
-		cover := exec.Command("ffmpeg", "-loglevel", "0", "-i", e.filePath, "-f", "singlejpeg", "pipe:1")
+		cover := exec.Command(e.options.Path+"ffmpeg", "-loglevel", "0", "-i", e.filePath, "-f", "singlejpeg", "pipe:1")
 		cover.Stdout = &cmdBuf
 
 		err = cover.Start()
