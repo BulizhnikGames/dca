@@ -232,7 +232,13 @@ func (e *EncodeSession) run() {
 
 	args = append(args, "pipe:1")
 
-	ffmpeg := exec.Command(e.options.Path+"ffmpeg", args...)
+	var execPath string
+	if e.options.Path == "" {
+		execPath = "ffmpeg"
+	} else {
+		execPath = e.options.Path + "ffmpeg.exe"
+	}
+	ffmpeg := exec.Command(execPath, args...)
 
 	// logln(ffmpeg.Args)
 
@@ -318,7 +324,13 @@ func (e *EncodeSession) writeMetadataFrame() {
 	var cmdBuf bytes.Buffer
 	// get ffprobe data
 	if e.pipeReader == nil {
-		ffprobe := exec.Command(e.options.Path+"ffprobe", "-v", "quiet", "-print_format", "json", "-show_format", e.filePath)
+		var execPath string
+		if e.options.Path == "" {
+			execPath = "ffprobe"
+		} else {
+			execPath = e.options.Path + "ffprobe.exe"
+		}
+		ffprobe := exec.Command(execPath, "-v", "quiet", "-print_format", "json", "-show_format", e.filePath)
 		ffprobe.Stdout = &cmdBuf
 
 		err := ffprobe.Start()
@@ -371,7 +383,12 @@ func (e *EncodeSession) writeMetadataFrame() {
 		cmdBuf.Reset()
 
 		// get cover art
-		cover := exec.Command(e.options.Path+"ffmpeg", "-loglevel", "0", "-i", e.filePath, "-f", "singlejpeg", "pipe:1")
+		if e.options.Path == "" {
+			execPath = "ffmpeg"
+		} else {
+			execPath = e.options.Path + "ffmpeg.exe"
+		}
+		cover := exec.Command(execPath, "-loglevel", "0", "-i", e.filePath, "-f", "singlejpeg", "pipe:1")
 		cover.Stdout = &cmdBuf
 
 		err = cover.Start()
