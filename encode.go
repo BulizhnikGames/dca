@@ -13,6 +13,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -236,7 +237,10 @@ func (e *EncodeSession) run() {
 	if e.options.Path == "" {
 		execPath = "ffmpeg"
 	} else {
-		execPath = e.options.Path + "ffmpeg.exe"
+		execPath = e.options.Path + "ffmpeg"
+		if runtime.GOOS == "windows" {
+			execPath += ".exe"
+		}
 	}
 	ffmpeg := exec.Command(execPath, args...)
 
@@ -328,7 +332,10 @@ func (e *EncodeSession) writeMetadataFrame() {
 		if e.options.Path == "" {
 			execPath = "ffprobe"
 		} else {
-			execPath = e.options.Path + "ffprobe.exe"
+			execPath = e.options.Path + "ffprobe"
+			if runtime.GOOS == "windows" {
+				execPath += ".exe"
+			}
 		}
 		ffprobe := exec.Command(execPath, "-v", "quiet", "-print_format", "json", "-show_format", e.filePath)
 		ffprobe.Stdout = &cmdBuf
@@ -386,7 +393,10 @@ func (e *EncodeSession) writeMetadataFrame() {
 		if e.options.Path == "" {
 			execPath = "ffmpeg"
 		} else {
-			execPath = e.options.Path + "ffmpeg.exe"
+			execPath = e.options.Path + "ffmpeg"
+			if runtime.GOOS == "windows" {
+				execPath += ".exe"
+			}
 		}
 		cover := exec.Command(execPath, "-loglevel", "0", "-i", e.filePath, "-f", "singlejpeg", "pipe:1")
 		cover.Stdout = &cmdBuf
